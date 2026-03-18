@@ -45,5 +45,12 @@ def get_credentials(config):
 
         with open(TOKEN_CONFIG_PATH, "w") as token:
             token.write(creds.to_json())
+            try:
+                os.chmod(token.fileno(), 0o600)
+            except PermissionError:
+                # If we cannot restrict permissions, propagate a clear error to the caller.
+                raise PermissionError(
+                    f"failed to restrict permissions on {TOKEN_CONFIG_PATH}"
+                )
 
     return requests.AuthorizedSession(creds)

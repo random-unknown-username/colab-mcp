@@ -103,7 +103,7 @@ class ColabRuntimeTool(object):
         Arguments:
             - code (string): the code to execute.
         """
-        logging.info(f"running code {code}")
+        logging.info("running code of length %d", len(code))
         reply = self.kernel_client.execute(code)
         if reply and reply.get("outputs"):
             return reply.get("outputs")

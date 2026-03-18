@@ -219,3 +219,17 @@ async def test_token_in_url():
 
         assert not server.connection_live.is_set()
         assert not server.connection_lock.locked()
+
+
+@pytest.mark.asyncio
+async def test_token_substring_not_accepted():
+    with pytest.raises(
+        websockets.exceptions.InvalidStatus,
+        check=lambda e: e.response.status_code == 403,
+    ):
+        async with ColabWebSocketServer() as server:
+            await websockets.connect(
+                f"ws://localhost:{server.port}?access_token=FAKE_{server.token}",
+                origin="https://colab.google.com",
+                subprotocols=["mcp"],
+            )

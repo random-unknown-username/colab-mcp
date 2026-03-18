@@ -63,8 +63,9 @@ class TestAuth(unittest.TestCase):
     @patch("colab_mcp.auth.requests.AuthorizedSession")
     @patch("os.path.exists")
     @patch("builtins.open", new_callable=mock_open)
+    @patch("os.chmod")
     def test_get_credentials_expired_token_with_refresh(
-        self, mock_file, mock_exists, mock_session, mock_creds, mock_request
+        self, mock_chmod, mock_file, mock_exists, mock_session, mock_creds, mock_request
     ):
         """Test getting credentials when token is expired but has a refresh token."""
         mock_exists.return_value = True
@@ -80,6 +81,7 @@ class TestAuth(unittest.TestCase):
 
         mock_creds_instance.refresh.assert_called_once()
         mock_file.assert_called_with(self.token_path, "w")
+        mock_chmod.assert_called_once()
         mock_session.assert_called_once_with(mock_creds_instance)
         self.assertEqual(session, mock_session.return_value)
 
@@ -87,8 +89,9 @@ class TestAuth(unittest.TestCase):
     @patch("colab_mcp.auth.requests.AuthorizedSession")
     @patch("os.path.exists")
     @patch("builtins.open", new_callable=mock_open)
+    @patch("os.chmod")
     def test_get_credentials_no_token_full_flow(
-        self, mock_file, mock_exists, mock_session, mock_flow
+        self, mock_chmod, mock_file, mock_exists, mock_session, mock_flow
     ):
         """Test getting credentials when no token exists (full OAuth flow)."""
         mock_exists.return_value = False
@@ -106,6 +109,7 @@ class TestAuth(unittest.TestCase):
         )
         mock_flow_instance.run_local_server.assert_called_once()
         mock_file.assert_called_with(self.token_path, "w")
+        mock_chmod.assert_called_once()
         mock_session.assert_called_once_with(mock_creds_instance)
         self.assertEqual(session, mock_session.return_value)
 
