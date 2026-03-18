@@ -50,7 +50,7 @@ def get_credentials(config):
             except PermissionError:
                 # If we cannot restrict permissions, propagate a clear error to the caller.
                 raise PermissionError(
-                    f"failed to restrict permissions on {TOKEN_CONFIG_PATH}"
+                    f"failed to restrict permissions on {TOKEN_CONFIG_PATH}; ensure the filesystem supports chmod and you have permission to change file modes"
                 )
 
     return requests.AuthorizedSession(creds)

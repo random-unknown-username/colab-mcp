@@ -96,7 +96,7 @@ class ColabWebSocketServer:
         if token_param is not None:
             if token_param == self.token:
                 return None
-            return Response(403, "Bad authorization token", Headers([]))
+            return Response(403, "Invalid authorization token", Headers([]))
         try:
             headers: Headers = request.headers
             auth_header = headers.get("Authorization")
@@ -109,7 +109,7 @@ class ColabWebSocketServer:
             return Response(400, "Invalid header format", Headers([]))
         if token == self.token:
             return None
-        return Response(403, "Bad authorization token", Headers([]))
+        return Response(403, "Invalid authorization token", Headers([]))
 
     async def _connection_handler(self, websocket: ServerConnection):
         """
