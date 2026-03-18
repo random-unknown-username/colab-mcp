@@ -20,6 +20,7 @@ import mcp.types as types
 from mcp.shared.message import SessionMessage
 from pydantic_core import ValidationError
 import secrets
+from urllib.parse import parse_qs, urlsplit
 import websockets
 from websockets.asyncio.server import ServerConnection
 from websockets.datastructures import Headers
@@ -89,8 +90,13 @@ class ColabWebSocketServer:
             pass
 
     def _validate_authorization(self, websocket: ServerConnection, request: Request):
-        if request.path.find(f"access_token={self.token}") != -1:
-            return None
+        parsed = urlsplit(request.path)
+        query_params = parse_qs(parsed.query)
+        token_param = query_params.get("access_token", [None])[0]
+        if token_param is not None:
+            if token_param == self.token:
+                return None
+            return Response(403, "Invalid authorization token", Headers([]))
         try:
             headers: Headers = request.headers
             auth_header = headers.get("Authorization")
@@ -103,7 +109,7 @@ class ColabWebSocketServer:
             return Response(400, "Invalid header format", Headers([]))
         if token == self.token:
             return None
-        return Response(403, "Bad authorization token", Headers([]))
+        return Response(403, "Invalid authorization token", Headers([]))
 
     async def _connection_handler(self, websocket: ServerConnection):
         """

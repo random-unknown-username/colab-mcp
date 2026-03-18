@@ -195,8 +195,6 @@ class ColabClient:
         self.colab_domain = env.domain
         self.colab_api_domain = env.api
         self.session = session  # requests.Session()
-        if "localhost" in self.colab_domain:
-            self.session.verify = False
         self.logger = logger or logging.getLogger(__name__)
 
     def _strip_xssi_prefix(self, v: str) -> str:
